@@ -1,6 +1,3 @@
--- Caso seja nescessário
-use dbescola;
-
 create table tbest(
 IdUf tinyint primary key,
 NomeUfs varchar(2) not null,
@@ -25,3 +22,5 @@ NomeCidade varchar(50) not null
 alter table tbcidade modify NomeCidade varchar(250) null;
 
 alter table tbendereco add CONSTRAINT Fk_IdCid_tbendereco FOREIGN KEY (IdCid) references tbcidade (IdCid);
+
+show tables;

@@ -1,5 +1,5 @@
 create database dbdesenvolvimento;
-show databases;
+
 
 use dbdesenvolvimento;
 create table tbproduto(
@@ -10,8 +10,7 @@ DataValidade date not null,
 Preco float not null
 );
 
-show tables;
-describe tbproduto;
+
 
 alter table tbproduto add Peso decimal (6,2) null;
 alter table tbproduto add Cor varchar(50) null;
@@ -21,8 +20,8 @@ alter table tbproduto drop Cor;
 
 alter table tbproduto modify Peso decimal (6,2) not null;
 
-alter table tbproduto drop Cor;
-/* Não foi possivel apagar.
+-- alter table tbproduto drop Cor;
+/* o comando acima não funcionou, não foi possivel apagar.
 Isso acontece porque já foi utilizado esse comando antes, ou seja, a coluna já foi apagada.
 Só funcionará o comando para apagar a coluna caso ela for adicionado novamente e tentar apaga-la outra vez*/
 
@@ -40,7 +39,6 @@ CodigoCli int primary key,
 DataCadastro date not null
 );
 
-create database dblojagrande;
 use dblojagrande;
 
 create table tbfuncionario(
@@ -51,4 +49,7 @@ DataCadastro date not null
 
 drop database dbLojaGrande;
 
+use dblojica;
 alter table tbcliente add cpf decimal (11,0) not null unique;
+
+show databases;

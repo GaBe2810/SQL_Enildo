@@ -1,15 +1,12 @@
-create database NomeMae_db;
-show databases;
-show tables;
+create database Tais_Luzia;
 
-use NomeMae_db;
+
+use Tais_Luzia;
 create table tbvenda(
 NF int auto_increment primary key,
 DataValidade datetime not null
 );
 
-describe tbvenda;
-describe produto;
 
 alter table tbvenda add preco decimal(6,2) not null;
 alter table tbvenda add qtd smallint, add check(qtd > 0);
@@ -21,4 +18,10 @@ CodigoB decimal(13,0) primary key,
 NomeProd varchar(50) not null
 );
 
-alter table tbvenda add CodigoB decimal(13,0), add foreign key(CodigoB) references produto (CodigoB);
+
+alter table tbvenda add CodigoB decimal(13,0);
+alter table tbvenda add CONSTRAINT Fk_CodigoB_tbvenda FOREIGN KEY (CodigoB) references produto (CodigoB);
+show databases;
+show tables;
+describe produto;
+describe tbvenda;

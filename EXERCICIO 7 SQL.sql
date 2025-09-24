@@ -1,6 +1,5 @@
 -- Gabriel e Nicollas
 create database dbescola;
-show databases;
 
 use dbescola;
 
@@ -27,10 +26,10 @@ alter table tbcliente add CONSTRAINT Fk_Cep_tbcliente FOREIGN KEY (Cep) referenc
 
 describe tbcliente;
 /*Dificuldades
-1 - 
-2 - 
-3 - 
+1 - Entender o funcionamento do decimal
+2 - entender tabelas intermediarias
+3 - Entender o "Não pode ser nulo"
 */
 
-show databases;
 drop database dbempresa;
+show databases;
