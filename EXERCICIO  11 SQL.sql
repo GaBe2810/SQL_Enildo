@@ -132,6 +132,70 @@ END $$
 
 call spInsertCidade (1 , 'Rio de Janeiro');
 call spInsertCidade (2 , 'Sao Carlos');
--- call spInsertCidade ( , );
+call spInsertCidade (3 , 'Campinas');
+call spInsertCidade (4 , 'Franco da Rocha');
+call spInsertCidade (5 , 'Osasco');
+call spInsertCidade (6 , 'Pirituba');
+call spInsertCidade (7 , 'Lapa');
+call spInsertCidade (8 , 'Ponta Grossa');
 
 select * from tbcidade;
+
+-- exercicio 3
+delimiter $$
+CREATE PROCEDURE spInsertUf (vUfId int, vUF varchar (200))
+BEGIN
+insert into tbestado (UfId, UF)
+			values (vUfId, vUF);
+END $$
+
+call spInsertUf (1, 'SP');
+call spInsertUf (2, 'RJ');
+call spInsertUf (3, 'RS');
+
+select * from tbestado;
+
+-- exercicio 4
+
+delimiter $$
+CREATE PROCEDURE spInsertBairro (vBairroId int, vBairro varchar (200))
+BEGIN
+insert into tbbairro (BairroId, Bairro)
+			values (vBairroId, vBairro);
+END $$
+
+call spInsertBairro (1, 'Aclimação');
+call spInsertBairro (2, 'Capão Redondo');
+call spInsertBairro (3, 'Pirituba');
+call spInsertBairro (4, 'Liberdade');
+
+select * from tbbairro;
+
+-- exercicio 5
+delimiter $$
+CREATE PROCEDURE spInsertProduto (vCodigoBarras decimal(14,0), vNome varchar (200), vValor decimal(8,2), vQtd int)
+BEGIN
+insert into tbproduto (CodigoBarras, Nome, Valor, Qtd)
+			values (vCodigoBarras, vNome, vValor, vQtd);
+END $$
+
+call spInsertProduto (12345678910111, 'Rei de Papel Mache', 54.61, 120);
+call spInsertProduto (12345678910112, 'Bolinha de Sabão', 100.45, 120);
+call spInsertProduto (12345678910113, 'Carro Bate', 44.00, 120);
+call spInsertProduto (12345678910114, 'Bola Furada', 10.00, 120);
+call spInsertProduto (12345678910115, 'Maça Laranja', 99.44, 120);
+call spInsertProduto (12345678910116, 'Boneco do Hitler', 124.00, 200);
+call spInsertProduto (12345678910117, 'Farinha de Surui', 50.00, 200);
+call spInsertProduto (12345678910118, 'Zelador de Cemiterio', 24.50, 100);
+
+select * from tbproduto;
+
+-- exercicio 6
+
+/*delimiter $$
+CREATE PROCEDURE spInsertEndereco (vLogradouro varchar(200), vCEP decimal (8,0), vBairroID int, vCidadeID int, vUfID int)
+BEGIN
+insert into tbproduto (Logradouro, CEP, BairroID, CidadeID, UfID)
+			values (vLogradouro, vCEP, vBairroID, vCidadeID, vUfID);
+END $$
+*/

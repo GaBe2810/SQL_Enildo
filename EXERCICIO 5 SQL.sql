@@ -1,7 +1,7 @@
-create database Tais_Luzia;
+create database Katia_Luzia;
 
 
-use Tais_Luzia;
+use Katia_Luzia;
 create table tbvenda(
 NF int auto_increment primary key,
 DataValidade datetime not null

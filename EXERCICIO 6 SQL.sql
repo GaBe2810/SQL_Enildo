@@ -11,7 +11,6 @@ Preco float not null
 );
 
 
-
 alter table tbproduto add Peso decimal (6,2) null;
 alter table tbproduto add Cor varchar(50) null;
 alter table tbproduto add Marca varchar(50) not null;

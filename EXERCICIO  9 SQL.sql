@@ -47,13 +47,13 @@ INSERT INTO tbbanco VALUES
 (104, 'Caixa Economica Federal'),
 (801, 'Banco Escola');
 
-INSERT INTO tbagencia VALUES -- agencia,cod,end
+INSERT INTO tbagencia VALUES
 (123, 1, 'Av Paulista,78'),
 (159, 104, 'Rua Liberdade, 124'),
 (401, 801, 'Rua Vinte Três, 23'),
 (485, 801, 'Av Marechal, 68');
 
-INSERT INTO tbconta VALUES -- numconta, numagencia, saldo, tipoconta
+INSERT INTO tbconta VALUES
 (9876, 123, 456.05, 1),
 (9877, 123, 321.00, 1),
 (9878, 485, 2, 100.00),

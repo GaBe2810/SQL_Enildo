@@ -1,4 +1,4 @@
--- Gabriel e Nicollas
+-- Gabriel e Vitoria
 create database dbescola;
 
 use dbescola;

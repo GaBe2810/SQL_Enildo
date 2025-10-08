@@ -1,3 +1,4 @@
+-- Usar a database dbescoola
 create table tbest(
 IdUf tinyint primary key,
 NomeUfs varchar(2) not null,
