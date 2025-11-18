@@ -40,3 +40,43 @@ alter table tbAluno2_tb modify DataNasc date not null;
 
 truncate table tbAluno_tb; // tira os gaps da tabela
 ```
+
+``` sql
+7
+SELECT 
+    c.Id,
+    c.NomeCli,
+    pf.CPF,
+    pf.RG,
+    pf.RG_Dig,
+    pf.Nasc,
+    c.NumEnd,
+    c.CompEnd,
+    c.CepCli,
+    e.Logradouro,
+    b.Bairro,
+    ci.Cidade,
+    uf.UF
+FROM tbCliente c
+INNER JOIN tbCliente_PF pf ON pf.Id = c.Id
+LEFT JOIN tbEndereco e ON e.CEP = c.CepCli
+LEFT JOIN tbBairro b ON b.BairroId = e.BairroId
+LEFT JOIN tbCidade ci ON ci.CidadeId = e.CidadeId
+LEFT JOIN tbEstado uf ON uf.UfId = e.UfId
+ORDER BY c.Id;
+```
+
+``` sql
+6
+SELECT
+    e.CEP,
+    e.Logradouro,
+    b.Bairro,
+    c.Cidade,
+    uf.UF
+FROM tbEndereco e
+JOIN tbBairro b ON b.BairroId = e.BairroId
+JOIN tbCidade c ON c.CidadeId = e.CidadeId
+JOIN tbEstado uf ON uf.UfId = e.UfId;
+
+```
