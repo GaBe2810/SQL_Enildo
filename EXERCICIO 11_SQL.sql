@@ -154,7 +154,6 @@ call spInsertCidade (6 , 'Pirituba');
 call spInsertCidade (7 , 'Lapa');
 call spInsertCidade (8 , 'Ponta Grossa');
 
-select * from tbcidade;
 -- exercicio 3
 delimiter $$
 CREATE PROCEDURE spInsertUf (vUfId int, vUF varchar (200))
@@ -168,7 +167,6 @@ call spInsertUf (1, 'SP');
 call spInsertUf (2, 'RJ');
 call spInsertUf (3, 'RS');
 
-select * from tbestado;
 
 -- exercicio 4
 
@@ -185,7 +183,6 @@ call spInsertBairro (2, 'Capão Redondo');
 call spInsertBairro (3, 'Pirituba');
 call spInsertBairro (4, 'Liberdade');
 
-select * from tbbairro;
 
 -- exercicio 5
 delimiter $$
@@ -205,7 +202,6 @@ call spInsertProduto (12345678910116, 'Boneco do Hitler', 124.00, 200);
 call spInsertProduto (12345678910117, 'Farinha de Surui', 50.00, 200);
 call spInsertProduto (12345678910118, 'Zelador de Cemiterio', 24.50, 100);
 
-select * from tbproduto;
 
 -- exercicio 6
 
@@ -303,17 +299,6 @@ CALL spInsertEndereco(12345055, 'Rua Piu XI', 'Penha', 'Campinas', 'SP');
 CALL spInsertEndereco(12345056, 'Rua Chocolate', 'Aclimação', 'Barra Mansa', 'RJ');
 CALL spInsertEndereco(12345057, 'Rua Pão na Chapa', 'Barra Funda', 'Ponta Grossa', 'RS');
 
-
-SELECT
-    e.CEP,
-    e.Logradouro,
-    b.Bairro,
-    c.Cidade,
-    uf.UF
-FROM tbEndereco e
-JOIN tbBairro b ON b.BairroId = e.BairroId
-JOIN tbCidade c ON c.CidadeId = e.CidadeId
-JOIN tbEstado uf ON uf.UfId = e.UfId;
 
 -- exercicio 7
 
@@ -459,28 +444,6 @@ CALL spInsertClientePF(
     12345678915, 12345682, '0', '2002-07-15',
     'Av Nova', 'Jardim Santa Isabel', 'Cuiabá', 'MT'
 );
-
-SELECT 
-    c.Id,
-    c.NomeCli,
-    pf.CPF,
-    pf.RG,
-    pf.RG_Dig,
-    pf.Nasc,
-    c.NumEnd,
-    c.CompEnd,
-    c.CepCli,
-    e.Logradouro,
-    b.Bairro,
-    ci.Cidade,
-    uf.UF
-FROM tbCliente c
-INNER JOIN tbCliente_PF pf ON pf.Id = c.Id
-LEFT JOIN tbEndereco e ON e.CEP = c.CepCli
-LEFT JOIN tbBairro b ON b.BairroId = e.BairroId
-LEFT JOIN tbCidade ci ON ci.CidadeId = e.CidadeId
-LEFT JOIN tbEstado uf ON uf.UfId = e.UfId
-ORDER BY c.Id;
 
 -- Exercicio 8
 
@@ -649,3 +612,170 @@ CALL spInsertCompra(2482, 'Revenda Chico Loco', '22/04/2020', 12345678910112, 40
 CALL spInsertCompra(21563, 'Marcelo Dedal', '12/07/2020', 12345678910113, 3.00, 300, 300, 900.00);
 CALL spInsertCompra(156354, 'Revenda Chico Loco', '23/11/2021', 12345678910115, 54.00, 350, 350, 18900.00);
 
+-- exercicio 10
+
+DELIMITER $$
+
+CREATE PROCEDURE spInsertVenda(
+    vNumeroVenda INT,
+    vNomeCliente VARCHAR(200),
+    vCodigoBarras DECIMAL(14,0),
+    vQtd INT
+)
+BEGIN
+    DECLARE vIdCli INT;
+    DECLARE vValorItem DECIMAL(8,2);
+    DECLARE vTotal DECIMAL(10,2);
+
+    SELECT Id INTO vIdCli
+    FROM tbCliente
+    WHERE NomeCli = vNomeCliente
+    LIMIT 1;
+
+    IF vIdCli IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cliente não cadastrado.';
+    END IF;
+
+    SELECT ValorUnitario INTO vValorItem
+    FROM tbProduto
+    WHERE CodigoBarras = vCodigoBarras
+    LIMIT 1;
+
+    IF vValorItem IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Produto não cadastrado.';
+    END IF;
+
+    SET vTotal = vValorItem * vQtd;
+
+    -- Inserir venda
+    INSERT INTO tbVenda(NumeroVenda, DataVenda, TotalVenda, IdCli)
+    VALUES (vNumeroVenda, CURDATE(), vTotal, vIdCli);
+
+    -- Inserir item
+    INSERT INTO tbItemVenda(NumeroVenda, CodigoBarras, ValorItem, Qtd)
+    VALUES (vNumeroVenda, vCodigoBarras, vValorItem, vQtd);
+
+END $$
+
+DELIMITER ;
+CALL spInsertVenda(1, 'Pimpão',        12345678910111, 1);
+CALL spInsertVenda(2, 'Lança Perfume', 12345678910112, 2);
+CALL spInsertVenda(3, 'Pimpão',        12345678910113, 1);
+
+
+-- exercicio 11
+
+DELIMITER $$
+
+CREATE PROCEDURE spEmitirNotaFiscal(
+    vNF INT,
+    vNomeCliente VARCHAR(200)
+)
+BEGIN
+    DECLARE vIdCli INT;
+    DECLARE vTotal DECIMAL(10,2);
+
+    -- Buscar cliente
+    SELECT Id INTO vIdCli
+    FROM tbCliente
+    WHERE NomeCli = vNomeCliente
+    LIMIT 1;
+
+    IF vIdCli IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cliente não cadastrado.';
+    END IF;
+
+    -- Somar vendas do cliente
+    SELECT SUM(TotalVenda) INTO vTotal
+    FROM tbVenda
+    WHERE IdCli = vIdCli;
+
+    IF vTotal IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cliente não possui vendas.';
+    END IF;
+
+    INSERT INTO tbNota_Fiscal(NF, TotalNota, DataEmissao)
+    VALUES (vNF, vTotal, CURDATE());
+
+    -- Atualizar as vendas associando NF
+    UPDATE tbVenda SET NF = vNF WHERE IdCli = vIdCli;
+
+END $$
+
+DELIMITER ;
+
+CALL spEmitirNotaFiscal(359, 'Pimpão');
+CALL spEmitirNotaFiscal(360, 'Lança Perfume');
+
+
+-- exercicio 12
+
+DELIMITER $$
+
+CREATE PROCEDURE spInsertProdutoNovo(
+    vCodigo DECIMAL(14,0),
+    vNome VARCHAR(200),
+    vValor DECIMAL(8,2),
+    vQtd INT
+)
+BEGIN
+    INSERT INTO tbProduto (CodigoBarras, Nome, ValorUnitario, Qtd)
+    VALUES (vCodigo, vNome, vValor, vQtd);
+END $$
+
+DELIMITER ;
+
+CALL spInsertProdutoNovo(12345678910130, 'Camiseta de Poliéster', 35.61, 100);
+CALL spInsertProdutoNovo(12345678910131, 'Blusa Frio Moletom', 200.00, 100);
+CALL spInsertProdutoNovo(12345678910132, 'Vestido Decote Redondo', 144.00, 50);
+
+-- exercicio 13
+
+DELIMITER $$
+
+CREATE PROCEDURE spDeleteProduto(
+    vCodigo DECIMAL(14,0)
+)
+BEGIN
+    DELETE FROM tbProduto WHERE CodigoBarras = vCodigo;
+END $$
+
+DELIMITER ;
+
+CALL spDeleteProduto(12345678910116);
+CALL spDeleteProduto(12345678910117);
+
+-- exercicio 14
+
+DELIMITER $$
+
+CREATE PROCEDURE spUpdateProduto(
+    vCodigo DECIMAL(14,0),
+    vNovoNome VARCHAR(200),
+    vNovoValor DECIMAL(8,2)
+)
+BEGIN
+    UPDATE tbProduto
+    SET Nome = vNovoNome,
+        ValorUnitario = vNovoValor
+    WHERE CodigoBarras = vCodigo;
+END $$
+
+DELIMITER ;
+
+CALL spUpdateProduto(12345678910111, 'Rei de Papel Mache', 64.50);
+CALL spUpdateProduto(12345678910112, 'Bolinha de Sabão', 120.00);
+CALL spUpdateProduto(12345678910113, 'Carro Bate Bate', 64.00);
+
+-- exercicio 15
+
+DELIMITER $$
+
+CREATE PROCEDURE spMostrarProduto()
+BEGIN
+select * from tbproduto order by CodigoBarras;
+END$$
+
+DELIMITER ;
+
+CALL spMostrarProduto();
