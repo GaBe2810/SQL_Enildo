@@ -241,7 +241,6 @@ BEGIN
         SET vUF = 'RS';
     END IF;
 
-    -- Condicional CIDADE
     IF vCidadeId = 1 THEN
         SET vCidade = 'Rio de Janeiro';
     ELSEIF vCidadeId = 2 THEN
@@ -264,8 +263,6 @@ BEGIN
         SET vCidade = 'Barra Mansa';
     END IF;
 
-
-    -- Condicional BAIRRO
     IF vBairroId = 1 THEN
         SET vBairro = 'Aclimação';
     ELSEIF vBairroId = 2 THEN
@@ -341,12 +338,10 @@ BEGIN
     DECLARE vCidadeId INT;
     DECLARE vUfId INT;
 
-    -- Buscar IDs
     SELECT BairroId INTO vBairroId FROM tbBairro WHERE Bairro = vBairro LIMIT 1;
     SELECT CidadeId INTO vCidadeId FROM tbCidade WHERE Cidade = vCidade LIMIT 1;
     SELECT UfId INTO vUfId FROM tbEstado WHERE UF = vUF LIMIT 1;
 
-    -- IFs para UF
     IF vUfId = 1 THEN SET vUF = 'SP';
     ELSEIF vUfId = 2 THEN SET vUF = 'RJ';
     ELSEIF vUfId = 3 THEN SET vUF = 'RS';
@@ -354,7 +349,6 @@ BEGIN
     ELSEIF vUfId = 5 THEN SET vUF = 'PE';
     END IF;
 
-    -- IFs para Cidade
     IF vCidadeId = 1 THEN
         SET vCidade = 'Rio de Janeiro';
     ELSEIF vCidadeId = 2 THEN
@@ -381,7 +375,6 @@ BEGIN
 		SET vCidade = 'Recife';
     END IF;
 
-    -- IFs para Bairro
     IF vBairroId = 1 THEN
         SET vBairro = 'Aclimação';
     ELSEIF vBairroId = 2 THEN
@@ -632,26 +625,18 @@ BEGIN
     WHERE NomeCli = vNomeCliente
     LIMIT 1;
 
-    IF vIdCli IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cliente não cadastrado.';
-    END IF;
 
     SELECT ValorUnitario INTO vValorItem
     FROM tbProduto
     WHERE CodigoBarras = vCodigoBarras
     LIMIT 1;
 
-    IF vValorItem IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Produto não cadastrado.';
-    END IF;
 
     SET vTotal = vValorItem * vQtd;
 
-    -- Inserir venda
     INSERT INTO tbVenda(NumeroVenda, DataVenda, TotalVenda, IdCli)
     VALUES (vNumeroVenda, CURDATE(), vTotal, vIdCli);
-
-    -- Inserir item
+    
     INSERT INTO tbItemVenda(NumeroVenda, CodigoBarras, ValorItem, Qtd)
     VALUES (vNumeroVenda, vCodigoBarras, vValorItem, vQtd);
 
@@ -675,29 +660,18 @@ BEGIN
     DECLARE vIdCli INT;
     DECLARE vTotal DECIMAL(10,2);
 
-    -- Buscar cliente
     SELECT Id INTO vIdCli
     FROM tbCliente
     WHERE NomeCli = vNomeCliente
     LIMIT 1;
-
-    IF vIdCli IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cliente não cadastrado.';
-    END IF;
-
-    -- Somar vendas do cliente
+    
     SELECT SUM(TotalVenda) INTO vTotal
     FROM tbVenda
     WHERE IdCli = vIdCli;
 
-    IF vTotal IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cliente não possui vendas.';
-    END IF;
-
     INSERT INTO tbNota_Fiscal(NF, TotalNota, DataEmissao)
     VALUES (vNF, vTotal, CURDATE());
 
-    -- Atualizar as vendas associando NF
     UPDATE tbVenda SET NF = vNF WHERE IdCli = vIdCli;
 
 END $$
